@@ -1,11 +1,11 @@
 ---
 name: goal-all-working-skill
-description: Turn a broad "make everything work" request into a compact goal, analyze the full repo for routes, menus, forms, DB/API-backed flows, placeholders, mocks, dead buttons, and false-finish risks, then execute until every user-visible flow is proven working or explicitly blocked.
+description: Turn a broad "finish it / make everything work" request into a compact goal, classify the conversation type, analyze the full relevant system, then execute until every user-visible or durable workflow is proven working or explicitly blocked.
 ---
 
 # Goal All Working Skill
 
-Use this skill when the user asks to make a repo, app, product, or workflow fully usable end to end, especially with wording like:
+Use this skill when the user asks to make a repo, app, product, operation, campaign, deployment, investigation, or cross-tool workflow fully usable end to end, especially with wording like:
 
 - "everything must work"
 - "all functionality"
@@ -13,13 +13,16 @@ Use this skill when the user asks to make a repo, app, product, or workflow full
 - "every menu button and flow"
 - "analyze and proceed"
 - "finish the app"
+- "close this completely"
 - "make it fully usable"
+- "continue until done"
 - "Goal to pursue"
 
 The skill has two jobs:
 
 1. Create a compact, execution-grade goal from the user's messy or broad request.
-2. Follow that goal through full-repo analysis, implementation, same-layer verification, commit/push, and live/user-surface proof when possible.
+2. Classify the conversation type so "done" means the right thing for that domain.
+3. Follow the goal through source analysis, implementation/action, same-layer verification, durable-state sync, commit/push/deploy/send/update when relevant, and live/user-surface proof when possible.
 
 ## Compact Goal Template
 
@@ -36,6 +39,55 @@ Do not stop at analysis or a plan if execution is possible. Implement, test at t
 ```
 
 Adapt nouns to the actual repo, but keep the hard finish line: no hidden placeholder or non-working functionality remains in the claimed scope.
+
+For non-code work, adapt the same template:
+
+```text
+Goal to pursue: Finish the intended workflow end to end. Read the relevant prior conversation/history, reconstruct my real intent, classify the durable system of record, and execute until the real outcome is complete or blocked with exact evidence.
+
+Do not trust prior "done/fixed/sent/deployed/submitted" claims. Re-verify from current source, provider/tool state, durable records, and user-visible or recipient-visible behavior. Find and eliminate common failure patterns: stale summaries, fake progress, partial sends, unsynced trackers, unverified provider states, orphaned branches, unresolved review stages, hidden blockers, wrong target lists, duplicate work, and adjacent-surface proof.
+
+Every promised item, target, record, route, release stage, campaign, tracker entry, handoff, and visible result must either be completed and proven at the correct layer or explicitly named as blocked with exact evidence. When one issue is found, sweep sibling items and the broader failure class.
+
+Do not stop at analysis or a plan if execution is possible. Execute, verify at the same layer that matters for the domain, red-team your own result, then commit/push/deploy/send/sync/update/live-verify when applicable. Final answer must separate proven completed work from unresolved blockers.
+```
+
+## Conversation Type Resolver
+
+Before running any repo-specific inventory, decide what kind of completion the conversation actually needs. A goal dropped into any conversation must finish the user's intent in that domain, not blindly force a code checklist.
+
+Resolve:
+
+- `domain`: product code, UI verification, deploy/release, analytics/marketing, outreach/communications, tracker/intent recovery, branch reconciliation, external handoff, data/DB, infra/provider, or a hybrid.
+- `durable_system`: the system that must agree with the final claim, such as repo/git, live site, app store, cloud control plane, database, CRM/tracker, inbox/thread log, analytics account, browser screenshots, task tracker, or external-agent task.
+- `effect_type`: code change, provider mutation, outbound send, tracker update, data export, deployment, verification-only audit, or recovery/reconciliation.
+- `proof_layer`: the exact layer that proves the outcome, not the adjacent convenience layer.
+- `safety_boundary`: whether the task can mutate external systems, send messages, change production data, change campaigns, delete branches, or only inspect/report.
+
+If the conversation is hybrid, split it into separate workstreams but keep one controller. Each workstream needs its own durable system and proof layer.
+
+## Universal Completion Inventory
+
+Build an inventory appropriate to the conversation type:
+
+- `promised_items`: explicit and implicit deliverables from current and relevant prior user messages.
+- `entry_points`: routes, menus, forms, commands, campaigns, tracker rows, branches, PRs, provider jobs, release targets, recipient lists, or handoff tasks.
+- `durable_state`: DB rows, tracker/CRM records, git refs, deployment records, store states, provider logs, sent mail/thread logs, screenshots, or exported files.
+- `action_surface`: UI, API, CLI, mail transport, provider console, CI runner, cloud deploy, browser-only QA, or external-agent UI.
+- `verification_layer`: the exact layer the user would experience or the durable system that owns the outcome.
+- `sibling_sweep`: nearest same-class items that would make the user say "you only fixed one".
+
+For each item, classify:
+
+- `works_proven`
+- `needs_action`
+- `placeholder_or_mock`
+- `dead_or_non_persistent`
+- `wrong_target_or_wrong_scope`
+- `blocked_external`
+- `intentionally_static_or_out_of_scope`
+
+Use the app-specific classification names when the task is code/UI; use the universal names for operational, provider, communication, release, analytics, tracker, or reconciliation work.
 
 ## Execution Workflow
 
@@ -82,7 +134,16 @@ If commands fail because paths differ, adapt them to the repo's actual stack. Th
 - loading, empty, error, success, and refresh-after-mutation states
 - duplicated pages, shells, wrappers, modes, or entry points that claim the same job
 
-### 3. Classify Every Surface
+For non-code conversations, use equivalent discovery commands/tools against the durable system of record:
+
+- provider/account state, current logs, current object ids, current run/job/release status, and exact stage names.
+- tracker/CRM rows, page bodies, comments, task statuses, ownership, blockers, timestamps, and duplicate records.
+- inbox/thread/sent-mail state, bounce/reply evidence, recipient identity, channel route, and prior-contact checks.
+- branch/ref/worktree/stash/PR/session state before reconciliation or cleanup.
+- exported/live data source freshness, account/property identity, date range, and contradictory source checks.
+- browser/user-surface state, screenshots, form persistence, refresh behavior, and role/account variants when verification is the product.
+
+### 3. Classify Every Surface Or Work Item
 
 For each surface, classify one of:
 
@@ -92,6 +153,8 @@ For each surface, classify one of:
 - `dead_or_non_persistent`
 - `blocked_external`
 - `intentionally_static`
+
+For operational work, classify every target or item using the universal inventory labels above and include the exact durable proof required to move it to `works_proven`.
 
 Do not call a surface working from nearby proof. Same-layer proof is required:
 
@@ -113,6 +176,10 @@ When one defect is proven, sweep siblings before closure:
 - one local-only save -> all persistence flows
 - one auth redirect break -> all auth-required pages
 - one duplicate entry point -> all duplicated routes/modes for the same feature
+- one wrong target -> the whole target selection and dedupe class
+- one incorrect stage label -> all stage labels and provider proof
+- one stale data claim -> all dated exports and current source proof
+- one hidden durable-state residue -> sibling records, refs, tasks, and session-derived work
 
 Use existing repo patterns. Keep diffs minimal. Do not build parallel pages or wrapper systems when an existing surface should be made real.
 
@@ -133,6 +200,11 @@ Before claiming completion, check the most common false finishes:
 - Live deploy was assumed from commit/push/build.
 - A temporary test artifact was left visible in production data.
 - A transient failure was encoded as a disabled feature or permanent gate.
+- A sent email, provider handoff, webhook, or API 200 was treated as recipient-visible success.
+- A tracker status changed but the actual durable artifact or provider state did not.
+- A release/upload/review/deploy stage was compressed into a stronger stage than proved.
+- A source-specific report ignored another source that contradicts it.
+- A broad "all" request was narrowed to the first convenient repo/page/campaign.
 
 If any item is true, keep working or report a precise blocker.
 
