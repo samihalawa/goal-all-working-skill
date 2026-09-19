@@ -269,3 +269,25 @@ Use `CHECKPOINT`, not `SHIPPED`, if any claimed menu/page/form/flow remains unpr
 - No permanent disabled/hidden/unavailable state from one transient error. Try three distinct approaches and verify two source layers first.
 - No commit/push/live claim without fresh proof in the current run.
 - Preserve unrelated user changes in dirty worktrees.
+
+## 2026-09-19 — Merged app-readiness proofs (absorbed from one-shot-production-ready-skill)
+
+When the conversation is make-this-app-production-ready (auth, CRUD, dashboard persistence, multi-user isolation, DB/env, live flows), run this inventory in addition to the all-working workflow. The one-shot skill is retired; its unique proofs live here.
+
+### Command-first shape proof
+Inspect current shapes before writing code: package.json, schema files, .env names (never values). For SQL, SHOW TABLES / SHOW COLUMNS / SELECT LIMIT 3 before writes. For APIs, one real read or mutation and read the body keys. Never assume a table, field, route, cookie, session, response, or env name from memory.
+
+### Multi-user proof
+At least two test users with unique identifiers. Prove: register, login, dashboard identity, user A creates a record, user B cannot see/edit/delete it, user B creates their own, refresh/relogin preserves each, logout clears protected access. Multi-tenant/role apps also need the tenant/role boundary. Direct DB rows must include the owner/tenant/account key used for isolation.
+
+### CRUD and dashboard proof
+For each core model: create through the real UI or app API; read after refresh; update a meaningful field and re-read; delete/archive and confirm; query the DB row when DB access exists; repeat from the other user. Local state, optimistic UI, a toast, or a mocked array is not persistence proof.
+
+### Database and env
+Use the repo's real database. Do not replace MySQL/Postgres with SQLite, localStorage, demo mode, sql.js, or /api/init magic unless the user explicitly asks. Confirm env names exist with redacted KEY=SET proof; never print secrets or connection strings. Prove the app writes to the intended DB through a real user flow.
+
+### Anti-downgrade
+Do not silently downgrade make-it-production-ready to I-reviewed-the-code-and-committed-it because Node is unavailable, a browser harness failed once, a test runner is missing, a service did not start first try, a deploy panel is slow, or a connector timed out. Those are recovery triggers. Try three realistic alternatives (repo-native test vs first failing command; login shell PATH; different proof surface; API plus browser; local plus production; DB query plus app layer). If those fail, close as CHECKPOINT with the exact proof layer still missing.
+
+### Forbidden completions
+Never treat as closure: the implementation is production-ready without same-layer proof; tests could not run here so I committed anyway; manual verification can happen later; the code follows the pattern file; the main feature looks correct; the deploy should be fine.
